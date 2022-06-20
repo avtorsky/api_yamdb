@@ -8,6 +8,7 @@
 ## Описание
 Проект [YaMDb](https://github.com/avtorsky/api_yamdb) собирает отзывы пользователей на произведения. В этом репозитории бэкенд проекта (приложение reviews) и API для него (приложение api), разработанные командой авторов:
 
+* Владимир
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
