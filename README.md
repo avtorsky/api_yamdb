@@ -1,8 +1,9 @@
 # YaMDb
 
 [Описание](#описание) /
-[История изменений](#история) /
-[Развернуть локально](#развернуть) /
+[История изменений](#история_изменений) /
+[Развернуть локально](#развернуть_локально) /
+[Документация](#документация)
 
 
 ## Описание
@@ -13,6 +14,11 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220623:
+* feat(./api_yamdb/reviews/models.py): подготовлены модели Category, Comment, Genre, GenreTitle, Review, Title, User
+* feat(./api_yamdb/reviews/migrations): выполнены миграции
+* build: разрешены конфликты в git, результаты командной работы влиты в ветку dev/sprint-10
+
 Release 20220620:
 * docs(./README.md): настройка git, определение ролей в команде
 
@@ -29,3 +35,9 @@ python3 manage.py createsuperuser
 python3 manage.py runserver
 ```
 
+## Документация
+
+```bash
+python3 manage.py runserver
+http://127.0.0.1:8000/redoc/
+```
