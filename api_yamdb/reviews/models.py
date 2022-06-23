@@ -201,7 +201,7 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Автор отзыва',
     )
-    scope = models.PositiveSmallIntegerField(
+    score = models.PositiveSmallIntegerField(
         validators=[
             MinValueValidator(1, 'Поставьте рейтинг от 1 до 10'),
             MaxValueValidator(10, 'Поставьте рейтинг от 1 до 10'),
