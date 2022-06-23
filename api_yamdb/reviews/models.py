@@ -1,5 +1,10 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import EmailValidator, MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import (
+    EmailValidator,
+    MaxValueValidator,
+    MinValueValidator,
+    RegexValidator,
+)
 from django.db import models
 
 from .validators import validate_title_year
@@ -93,7 +98,7 @@ class Genre(models.Model):
     )
 
     class Meta:
-        ordering = 'name'
+        ordering = ('name',)
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
@@ -114,7 +119,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        ordering = 'name'
+        ordering = ('name',)
         verbose_name_plural = 'Категории'
 
     def __str__(self):
@@ -129,7 +134,7 @@ class Title(models.Model):
         verbose_name='Произведение',
     )
     year = models.IntegerField(
-        validators=(validate_title_year),
+        validators=(validate_title_year,),
         verbose_name='Год выпуска',
     )
     description = models.TextField(
@@ -156,7 +161,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = 'name'
+        ordering = ('name',)
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
