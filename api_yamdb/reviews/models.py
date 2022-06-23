@@ -1,12 +1,11 @@
-from re import M
-from tabnanny import verbose
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import EmailValidator, RegexValidator
 
 
 class User(AbstractUser):
-    """ Модель юзер"""
+    """Модель юзер"""
+
     USER = 'user'
     ADMIN = 'admin'
     MODERATOR = 'moderator'
@@ -20,21 +19,25 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         verbose_name='Имя пользователя',
-        validators=[RegexValidator(
-            regex=r'^[\w.@+-_]+$', # проверить как вставить me
-            message='Имя не может быть "me".'
-        )],
+        validators=[
+            RegexValidator(
+                regex=r'^[\w.@+-_]+$',  # проверить как вставить me
+                message='Имя не может быть "me".',
+            )
+        ],
     )
     email = models.EmailField(
         max_length=254,
         unique=True,
-        validators=[EmailValidator,],
-        verbose_name='Электронная почта.',
+        validators=[
+            EmailValidator,
+        ],
+        verbose_name='Электронная почта',
     )
     first_name = models.TextField(
         max_length=150,
         blank=True,
-        )
+    )
     last_name = models.TextField(
         max_length=150,
         blank=True,
@@ -43,7 +46,7 @@ class User(AbstractUser):
         verbose_name='Пару слов о себе',
         blank=True,
     )
-    role  = models.CharField(
+    role = models.CharField(
         max_length=30,
         choices=USER_ROLE,
         default='user',
@@ -53,7 +56,7 @@ class User(AbstractUser):
     @property
     def is_user(self):
         return self.role == self.USER
-    
+
     @property
     def is_admin(self):
         return self.role == self.ADMIN
@@ -61,17 +64,14 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == self.MODERATOR
-    
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('id', )
+        ordering = ('id',)
 
         constraints = [
             models.UniqueConstraint(
-                fields=['username', 'email'],
-                name='unique_username_email'
+                fields=['username', 'email'], name='unique_username_email'
             ),
         ]
-
-
