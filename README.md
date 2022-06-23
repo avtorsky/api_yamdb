@@ -14,6 +14,11 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220623:
+* feat(./api_yamdb/reviews/models.py): подготовлены модели Category, Comment, Genre, GenreTitle, Review, Title, User
+* feat(./api_yamdb/reviews/migrations): выполнены миграции
+* build: разрешены конфликты в git, результаты командной работы влиты в ветку dev/sprint-10
+
 Release 20220620:
 * docs(./README.md): настройка git, определение ролей в команде
 
