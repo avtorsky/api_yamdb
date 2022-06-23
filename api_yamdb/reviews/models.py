@@ -1,12 +1,10 @@
-from re import M
-from tabnanny import verbose
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import EmailValidator, RegexValidator
 
 
 class User(AbstractUser):
-    """ Модель юзер"""
+    """ Модель юзер. """
     USER = 'user'
     ADMIN = 'admin'
     MODERATOR = 'moderator'
