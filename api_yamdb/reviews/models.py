@@ -29,7 +29,7 @@ class User(AbstractUser):
         validators=[
             RegexValidator(
                 regex=r'^[\w.@+-_]+$',  # проверить как вставить me
-                message='Имя не может быть "me".',
+                message='Недопустимое имя',
             )
         ],
     )
