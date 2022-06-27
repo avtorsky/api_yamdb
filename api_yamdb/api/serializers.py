@@ -28,7 +28,7 @@ class UserRegistrSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
-    
+
     class Meta:
         model = User
         fields = (
@@ -37,9 +37,29 @@ class TokenSerializer(serializers.ModelSerializer):
         )
 
 
-class UserEditSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True,
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+
     class Meta:
-        fields = ("username", "email", "first_name",
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        model = User
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', "username", "email", "first_name",
                   "last_name", "bio", "role")
         model = User
         read_only_fields = ('role',)
