@@ -14,6 +14,10 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220628:
+* feat(./api_yamdb/api/): подготовлены вьюсеты и сериализаторы моделей Category, Comment, Genre, Review, Title, User
+* feat(./api_yamdb/api/urls.py): настроен роутинг для всех эндпойнтов API
+
 Release 20220623:
 * feat(./api_yamdb/reviews/models.py): подготовлены модели Category, Comment, Genre, GenreTitle, Review, Title, User
 * feat(./api_yamdb/reviews/migrations): выполнены миграции
