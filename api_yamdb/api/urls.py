@@ -1,7 +1,16 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from .views import CommentViewSet, ReviewViewSet, UserViewSet, regist, get_jwt_token
+from .views import (
+    CategoryViewSet,
+    CommentViewSet,
+    GenreViewSet,
+    get_jwt_token,
+    regist,
+    ReviewViewSet,
+    TitleViewSet,
+    UserViewSet
+)
 
 router_v1 = routers.DefaultRouter()
 router_v1.register(
@@ -15,6 +24,10 @@ router_v1.register(
     basename='comments',
 )
 router_v1.register(r'users', UserViewSet, basename='users')
+router_v1.register(r'genres', GenreViewSet)
+router_v1.register(r'categories', CategoryViewSet)
+router_v1.register(r'titles', TitleViewSet)
+
 
 urlpatterns = [
     path('v1/auth/signup/', regist, name='regist'),

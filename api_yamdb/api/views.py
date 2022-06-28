@@ -1,21 +1,26 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework import filters, permissions, status, viewsets
+from rest_framework import filters, mixins, pagination, permissions, status, viewsets
 from rest_framework.decorators import api_view, action, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Review, Title, User
+from reviews.models import Category, Genre, Review, Title, User
 from .permissions import IsAdmin, IsAdminModeratorOwnerOrReadOnly
 from .serializers import (
+    CategorySerializer,
     CommentSerializer,
+    GenreSerializer,
     ReviewSerializer,
     TokenSerializer,
+    TitleSerializer,
+    TitleReadonlySerializer,
     UserRegistrSerializer,
     UserEditSerializer,
     UserSerializer
 )
+from .pagination import TitleGenreCategoryPagination
 
 
 @api_view(['POST',])
@@ -116,3 +121,62 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id, title=title_id)
         serializer.save(author=self.request.user, review=review)
+
+
+class GenreViewSet(mixins. CreateModelMixin,
+                   mixins.ListModelMixin, 
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
+    """"Вью-класс для жанров"""
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = pagination.PageNumberPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',) 
+
+
+class CategoryViewSet(mixins.CreateModelMixin,
+                   mixins.ListModelMixin, 
+                   mixins.DestroyModelMixin,
+                   viewsets.GenericViewSet):
+    """Вью-класс для категорий"""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = pagination.PageNumberPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',) 
+
+
+class TitleViewSet (viewsets.ModelViewSet):
+    """"Вью-класс для произведений"""
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head']
+    # Убираем метод put из разрешенных
+    pagination_class = TitleGenreCategoryPagination
+
+    def get_serializer_class(self):
+        if self.action in ('retrieve', 'list'):
+            return TitleReadonlySerializer
+        return TitleSerializer
+        # используем разные сериализаторы в зависимости от метода
+
+    
+    def get_queryset(self):
+        queryset = Title.objects.all()
+        category = self.request.query_params.get('category')
+        genre = self.request.query_params.get('genre')
+        name = self.request.query_params.get('name')
+        year = self.request.query_params.get('year')
+        if genre is not None:
+            queryset = queryset.filter(genre__slug=genre)
+        if category is not None:
+            queryset = queryset.filter(category__slug=category)
+        if name is not None:
+            queryset = queryset.filter(name=name)
+        if year is not None:
+            queryset = queryset.filter(year=year)
+        return queryset
+        # устанавливаем фильтрацию по полям
+        # Если в запросе присутствуют ключи фильтруемых полей
+        # фильтруем queryset по содержимому полей

@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import User, Comment, Review, Title
+from reviews.models import User, Category, Comment, Genre, Review, Title
 
 
 class UserRegistrSerializer(serializers.ModelSerializer):
@@ -113,4 +113,38 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'pub_date', 'author', 'review')
+        
+        
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+
+
+class TitleReadonlySerializer (serializers.ModelSerializer):
+    """"Сериализатор произведений для List и Retrieve"""
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True) 
+        
+    class Meta:
+        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        # прямо прописываем поля, для порядка выдачи в JSON
+        model = Title
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор произведений для Create, Partial_Update и Delete"""
+    category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
+    genre = serializers.SlugRelatedField(slug_field='slug', queryset = Genre.objects.all(), many=True)
+    # Many=True, потому что ManytoManyField
+
+    class Meta:
+        fields = ('__all__')
+        model = Title
         
