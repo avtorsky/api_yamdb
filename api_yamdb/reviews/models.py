@@ -28,8 +28,8 @@ class User(AbstractUser):
         verbose_name='Имя пользователя',
         validators=[
             RegexValidator(
-                regex=r'^[\w.@+-_]+$',  # проверить как вставить me
-                message='Имя не может быть "me".',
+                regex=r'^[\w.@+-_]+$',
+                message='Недопустимое имя',
             )
         ],
     )
