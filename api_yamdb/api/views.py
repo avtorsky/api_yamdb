@@ -1,13 +1,15 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework import filters, mixins, pagination, permissions, status, viewsets
+from rest_framework import (
+    filters, mixins, pagination, permissions, status, viewsets)
 from rest_framework.decorators import api_view, action, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title, User
-from .permissions import IsAdmin, IsAdminModeratorOwnerOrReadOnly
+from .permissions import (
+    IsAdmin, IsAdminModeratorOwnerOrReadOnly, IsAdminOrReadOnly)
 from .serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -23,7 +25,7 @@ from .serializers import (
 from .pagination import TitleGenreCategoryPagination
 
 
-@api_view(['POST',])
+@api_view(['POST', ])
 @permission_classes([permissions.AllowAny])
 def regist(request):
     serializer = UserRegistrSerializer(data=request.data)
@@ -44,7 +46,7 @@ def regist(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST',])
+@api_view(['POST', ])
 @permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
     serializer = TokenSerializer(data=request.data)
@@ -72,11 +74,11 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ('username',)
 
     @action(methods=['get', 'patch'],
-        detail=False,
-        url_path='me',
-        serializer_class = UserEditSerializer,
-        permission_classes=[permissions.IsAuthenticated]
-        )
+            detail=False,
+            url_path='me',
+            serializer_class=UserEditSerializer,
+            permission_classes=[permissions.IsAuthenticated]
+            )
     def portfolio(self, request):
         user = request.user
         if request.method == 'GET':
@@ -124,7 +126,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(mixins. CreateModelMixin,
-                   mixins.ListModelMixin, 
+                   mixins.ListModelMixin,
                    mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     """"Вью-класс для жанров"""
@@ -132,19 +134,25 @@ class GenreViewSet(mixins. CreateModelMixin,
     serializer_class = GenreSerializer
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',) 
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    # для того, чтобы получать эндпойнты по полю slug, а не pk
+    # добавляем этот аттрибут во вью и в сериализатор для жанров и категорий
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin, 
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+                      mixins.ListModelMixin,
+                      mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
     """Вью-класс для категорий"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',) 
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class TitleViewSet (viewsets.ModelViewSet):
@@ -154,6 +162,7 @@ class TitleViewSet (viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head']
     # Убираем метод put из разрешенных
     pagination_class = TitleGenreCategoryPagination
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ('retrieve', 'list'):
@@ -161,7 +170,6 @@ class TitleViewSet (viewsets.ModelViewSet):
         return TitleSerializer
         # используем разные сериализаторы в зависимости от метода
 
-    
     def get_queryset(self):
         queryset = Title.objects.all()
         category = self.request.query_params.get('category')
@@ -169,13 +177,14 @@ class TitleViewSet (viewsets.ModelViewSet):
         name = self.request.query_params.get('name')
         year = self.request.query_params.get('year')
         if genre is not None:
-            queryset = queryset.filter(genre__slug=genre)
+            queryset = queryset.filter(genre__slug__contains=genre)
+            # contains, для фильтрации по частичному совпадению
         if category is not None:
-            queryset = queryset.filter(category__slug=category)
+            queryset = queryset.filter(category__slug__contains=category)
         if name is not None:
-            queryset = queryset.filter(name=name)
+            queryset = queryset.filter(name__contains=name)
         if year is not None:
-            queryset = queryset.filter(year=year)
+            queryset = queryset.filter(year__contains=year)
         return queryset
         # устанавливаем фильтрацию по полям
         # Если в запросе присутствуют ключи фильтруемых полей

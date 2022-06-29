@@ -16,10 +16,11 @@ class UserRegistrSerializer(serializers.ModelSerializer):
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
+
     class Meta:
         model = User
-        fields = ['username', 'email',]
-    
+        fields = ['username', 'email', ]
+
     def validate_username(self, user):
         if user.lower() == 'me':
             raise serializers.ValidationError('username не может быть  "me".')
@@ -113,38 +114,44 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'pub_date', 'author', 'review')
-        
-        
+
+
 class GenreSerializer(serializers.ModelSerializer):
+    """"Сериализатор жанров"""
     class Meta:
         fields = ('name', 'slug')
         model = Genre
+        lookup_field = 'slug'
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """"Сериализатор категорий"""
     class Meta:
         fields = ('name', 'slug')
         model = Category
+        lookup_field = 'slug'
 
 
 class TitleReadonlySerializer (serializers.ModelSerializer):
     """"Сериализатор произведений для List и Retrieve"""
     category = CategorySerializer(read_only=True)
-    genre = GenreSerializer(read_only=True, many=True) 
-        
+    genre = GenreSerializer(read_only=True, many=True)
+
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('id', 'name', 'year', 'rating',
+                  'description', 'genre', 'category')
         # прямо прописываем поля, для порядка выдачи в JSON
         model = Title
 
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений для Create, Partial_Update и Delete"""
-    category = serializers.SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
-    genre = serializers.SlugRelatedField(slug_field='slug', queryset = Genre.objects.all(), many=True)
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all())
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True)
     # Many=True, потому что ManytoManyField
 
     class Meta:
         fields = ('__all__')
         model = Title
-        
