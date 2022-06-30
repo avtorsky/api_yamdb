@@ -9,7 +9,7 @@ from .views import (
     regist,
     ReviewViewSet,
     TitleViewSet,
-    UserViewSet
+    UserViewSet,
 )
 
 router_v1 = routers.DefaultRouter()

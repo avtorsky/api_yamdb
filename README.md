@@ -14,6 +14,10 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220630:
+* feat(./api_yamdb/api/filters.py): поддержана кастомная логика фильтрации объектов для эндпойнта api/v1/titles/
+* fix(./api_yamdb/api/): выполнена отладка компонентов приложения api по unit-тестам
+
 Release 20220628:
 * feat(./api_yamdb/api/): подготовлены вьюсеты и сериализаторы моделей Category, Comment, Genre, Review, Title, User
 * feat(./api_yamdb/api/urls.py): настроен роутинг для всех эндпойнтов API
