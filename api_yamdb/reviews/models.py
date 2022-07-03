@@ -11,7 +11,7 @@ from .validators import validate_title_year
 
 
 class User(AbstractUser):
-    """Модель юзер"""
+    """Модель юзер."""
 
     USER = 'user'
     ADMIN = 'admin'
@@ -23,9 +23,9 @@ class User(AbstractUser):
     ]
 
     username = models.CharField(
+        'Имя пользователя',
         max_length=150,
         unique=True,
-        verbose_name='Имя пользователя',
         validators=[
             RegexValidator(
                 regex=r'^[\w.@+-_]+$',
@@ -34,30 +34,32 @@ class User(AbstractUser):
         ],
     )
     email = models.EmailField(
+        'Электронная почта',
         max_length=254,
         unique=True,
         validators=[
             EmailValidator,
         ],
-        verbose_name='Электронная почта',
     )
     first_name = models.TextField(
+        'Имя',
         max_length=150,
         blank=True,
     )
     last_name = models.TextField(
+        'Фамилия',
         max_length=150,
         blank=True,
     )
     bio = models.TextField(
-        verbose_name='Пару слов о себе',
+        'Пару слов о себе',
         blank=True,
     )
     role = models.CharField(
+        'Роль',
         max_length=30,
         choices=USER_ROLE,
         default='user',
-        verbose_name='Роль',
     )
 
     @property
@@ -85,17 +87,9 @@ class User(AbstractUser):
 
 
 class Genre(models.Model):
-    """Модель жанра"""
-
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Жанр',
-    )
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        verbose_name='Метка',
-    )
+    """Модель жанра."""
+    name = models.CharField('Жанр', max_length=256,)
+    slug = models.SlugField(unique=True,)
 
     class Meta:
         ordering = ('name',)
@@ -106,17 +100,12 @@ class Genre(models.Model):
 
 
 class Category(models.Model):
-    """Модель категории"""
-
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Категория',
-    )
-    slug = models.SlugField(
-        max_length=50,
-        unique=True,
-        verbose_name='Метка',
-    )
+    """Модель категории."""
+    name = models.CharField('Категория', max_length=256,)
+    slug = models.SlugField(unique=True,)
+    # Убрал перевод, поскольку устоявшегося русского перевода нет
+    # slug он и есть slug
+    # Из всех которые есть мне больше всего нравится 'Уникальный идентификатор'
 
     class Meta:
         ordering = ('name',)
@@ -127,16 +116,14 @@ class Category(models.Model):
 
 
 class Title(models.Model):
-    """Модель произведения"""
-
-    name = models.CharField(
-        max_length=500,
-        verbose_name='Произведение',
-    )
-    year = models.IntegerField(
-        validators=(validate_title_year,),
-        verbose_name='Год выпуска',
-    )
+    """Модель произведения."""
+    name = models.CharField('Произведение', max_length=500,)
+    year = models.SmallIntegerField(
+        'Год выпуска',
+        db_index=True,
+        validators=(validate_title_year,))
+    # Артем, подскажи, пожалуйста, это тот тип поля, который ты имел в виду?
+    # Positive делать не стал, т.к. есть произведения, написанные до н.э. 
     description = models.TextField(
         null=True,
         blank=True,
@@ -151,13 +138,13 @@ class Title(models.Model):
         Category,
         related_name='titles',
         on_delete=models.PROTECT,
-        null=True,
+        blank=True,
         verbose_name='Категория',
     )
     rating = models.IntegerField(
+        'Рейтинг',
         default=None,
         null=True,
-        verbose_name='Рейтинг',
     )
 
     class Meta:
@@ -169,6 +156,7 @@ class Title(models.Model):
 
 
 class GenreTitle(models.Model):
+    """Вспомогательная модель жанров произведения."""
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -188,6 +176,7 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
+    """Модель отзывов."""
     title = models.ForeignKey(
         Title,
         related_name='reviews',
@@ -228,6 +217,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    """Модель комментариев."""
     review = models.ForeignKey(
         Review,
         related_name='comments',
