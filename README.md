@@ -14,6 +14,9 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220704:
+* fix(./api_yamdb/): внесены правки в приложения api и reviews по результатам code reivew
+
 Release 20220630:
 * feat(./api_yamdb/api/filters.py): поддержана кастомная логика фильтрации объектов для эндпойнта api/v1/titles/
 * fix(./api_yamdb/api/): выполнена отладка компонентов приложения api по unit-тестам
@@ -38,6 +41,11 @@ cd api_yamdb
 python -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
+```
+
+Создать локально файл окружения .env, в который записать SECRET_KEY и HOSTS, далее продолжить:
+
+```bash
 python3 manage.py migrate
 python3 manage.py createsuperuser
 python3 manage.py runserver

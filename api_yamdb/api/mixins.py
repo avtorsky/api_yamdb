@@ -1,4 +1,3 @@
-
 from rest_framework import mixins, viewsets
 
 
@@ -9,5 +8,6 @@ class CreateListDestroyViewset(
     viewsets.GenericViewSet,
 ):
     """Вьюсет для Create, List и Destroy."""
+
     serializer_class = None
     model_class = None

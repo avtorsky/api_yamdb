@@ -38,10 +38,10 @@ from .serializers import (
 from .pagination import TitleGenreCategoryPagination
 
 
-@api_view(['POST', ])
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def regist(request):
-    """ Вью-функция для регистрации пользователя."""
+    """Вью-функция для регистрации пользователя."""
     serializer = UserRegistrSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
@@ -59,7 +59,7 @@ def regist(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(['POST', ])
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
     """Вью-функция получения jwt-токена."""
@@ -78,6 +78,7 @@ def get_jwt_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     """Вью-класс модели User."""
+
     permission_classes = [IsAdmin]
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -113,6 +114,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вью-класс для отзывов."""
+
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
@@ -128,6 +130,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Вью-класс для комментариев."""
+
     serializer_class = CommentSerializer
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
@@ -144,6 +147,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class GenreViewSet(CreateListDestroyViewset):
     """Вью-класс для жанров."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = pagination.PageNumberPagination
@@ -157,6 +161,7 @@ class GenreViewSet(CreateListDestroyViewset):
 
 class CategoryViewSet(CreateListDestroyViewset):
     """Вью-класс для категорий."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = pagination.PageNumberPagination
@@ -168,6 +173,7 @@ class CategoryViewSet(CreateListDestroyViewset):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Вью-класс для произведений."""
+
     queryset = (
         Title.objects.all().annotate(Avg('reviews__score')).order_by('name')
     )
@@ -192,7 +198,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         # стандартного метода update из UpdateModelMixin
         instance = self.get_object()
         serializer = self.get_serializer(
-            instance, data=request.data, partial=True)
+            instance, data=request.data, partial=True
+        )
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 

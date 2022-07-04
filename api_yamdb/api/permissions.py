@@ -18,7 +18,7 @@ class IsAdminModeratorOwnerOrReadOnly(permissions.BasePermission):
 
 
 class IsAdmin(permissions.BasePermission):
-    """полные права на управление всем контентом проекта.
+    """Полные права на управление всем контентом проекта.
     Может создавать и удалять произведения,
     категории и жанры. Может назначать роли пользователям."""
 

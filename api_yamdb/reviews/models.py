@@ -37,29 +37,13 @@ class User(AbstractUser):
         'Электронная почта',
         max_length=254,
         unique=True,
-        validators=[
-            EmailValidator,
-        ],
+        validators=[EmailValidator],
     )
-    first_name = models.TextField(
-        'Имя',
-        max_length=150,
-        blank=True,
-    )
-    last_name = models.TextField(
-        'Фамилия',
-        max_length=150,
-        blank=True,
-    )
-    bio = models.TextField(
-        'Пару слов о себе',
-        blank=True,
-    )
+    first_name = models.TextField('Имя', max_length=150, blank=True)
+    last_name = models.TextField('Фамилия', max_length=150, blank=True)
+    bio = models.TextField('Дополнительная информация', blank=True)
     role = models.CharField(
-        'Роль',
-        max_length=30,
-        choices=USER_ROLE,
-        default='user',
+        'Роль', max_length=30, choices=USER_ROLE, default='user'
     )
 
     @property
@@ -81,15 +65,17 @@ class User(AbstractUser):
 
         constraints = [
             models.UniqueConstraint(
-                fields=['username', 'email'], name='unique_username_email'
+                fields=('username', 'email'),
+                name='unique_username_email',
             ),
         ]
 
 
 class Genre(models.Model):
     """Модель жанра."""
-    name = models.CharField('Жанр', max_length=256,)
-    slug = models.SlugField(unique=True,)
+
+    name = models.CharField('Жанр', max_length=256)
+    slug = models.SlugField(unique=True)
 
     class Meta:
         ordering = ('name',)
@@ -101,8 +87,9 @@ class Genre(models.Model):
 
 class Category(models.Model):
     """Модель категории."""
-    name = models.CharField('Категория', max_length=256,)
-    slug = models.SlugField(unique=True,)
+
+    name = models.CharField('Категория', max_length=256)
+    slug = models.SlugField(unique=True)
     # Убрал перевод, поскольку устоявшегося русского перевода нет
     # slug он и есть slug
     # Из всех которые есть мне больше всего нравится 'Уникальный идентификатор'
@@ -117,22 +104,16 @@ class Category(models.Model):
 
 class Title(models.Model):
     """Модель произведения."""
-    name = models.CharField('Произведение', max_length=500,)
+
+    name = models.CharField('Произведение', max_length=500)
     year = models.SmallIntegerField(
-        'Год выпуска',
-        db_index=True,
-        validators=(validate_title_year,))
-    # Артем, подскажи, пожалуйста, это тот тип поля, который ты имел в виду?
-    # Positive делать не стал, т.к. есть произведения, написанные до н.э. 
-    description = models.TextField(
-        null=True,
-        blank=True,
-        verbose_name='Описание',
+        'Год выпуска', db_index=True, validators=(validate_title_year,)
     )
+    # Артем, подскажи, пожалуйста, это тот тип поля, который ты имел в виду?
+    # Positive делать не стал, т.к. есть произведения, написанные до н.э.
+    description = models.TextField(blank=True, verbose_name='Описание')
     genre = models.ManyToManyField(
-        Genre,
-        through='GenreTitle',
-        verbose_name='Жанр',
+        Genre, through='GenreTitle', verbose_name='Жанр'
     )
     category = models.ForeignKey(
         Category,
@@ -141,11 +122,7 @@ class Title(models.Model):
         blank=True,
         verbose_name='Категория',
     )
-    rating = models.IntegerField(
-        'Рейтинг',
-        default=None,
-        null=True,
-    )
+    rating = models.IntegerField('Рейтинг', default=None, null=True)
 
     class Meta:
         ordering = ('name',)
@@ -157,6 +134,7 @@ class Title(models.Model):
 
 class GenreTitle(models.Model):
     """Вспомогательная модель жанров произведения."""
+
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -177,6 +155,7 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     """Модель отзывов."""
+
     title = models.ForeignKey(
         Title,
         related_name='reviews',
@@ -198,9 +177,7 @@ class Review(models.Model):
         verbose_name='Рейтинг',
     )
     pub_date = models.DateTimeField(
-        auto_now_add=True,
-        db_index=True,
-        verbose_name='Дата публикации',
+        auto_now_add=True, db_index=True, verbose_name='Дата публикации'
     )
 
     class Meta:
@@ -218,6 +195,7 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель комментариев."""
+
     review = models.ForeignKey(
         Review,
         related_name='comments',
@@ -234,9 +212,7 @@ class Comment(models.Model):
         verbose_name='Автор комментария',
     )
     pub_date = models.DateTimeField(
-        auto_now_add=True,
-        db_index=True,
-        verbose_name='Дата публикации',
+        auto_now_add=True, db_index=True, verbose_name='Дата публикации'
     )
 
     class Meta:
