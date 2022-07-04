@@ -4,8 +4,8 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
+    exceptions,
     filters,
-    mixins,
     pagination,
     permissions,
     status,
@@ -17,6 +17,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title, User
 from .filters import TitlesFilter
+from .mixins import CreateListDestroyViewset
 from .permissions import (
     IsAdmin,
     IsAdminModeratorOwnerOrReadOnly,
@@ -37,13 +38,10 @@ from .serializers import (
 from .pagination import TitleGenreCategoryPagination
 
 
-@api_view(
-    [
-        'POST',
-    ]
-)
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def regist(request):
+    """Вью-функция для регистрации пользователя."""
     serializer = UserRegistrSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
@@ -61,19 +59,15 @@ def regist(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(
-    [
-        'POST',
-    ]
-)
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
+    """Вью-функция получения jwt-токена."""
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User, username=serializer.validated_data['username']
     )
-    print(serializer.validated_data['confirmation_code'])
     if default_token_generator.check_token(
         user, serializer.validated_data['confirmation_code']
     ):
@@ -83,6 +77,8 @@ def get_jwt_token(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Вью-класс модели User."""
+
     permission_classes = [IsAdmin]
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -117,6 +113,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Вью-класс для отзывов."""
+
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
@@ -131,6 +129,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Вью-класс для комментариев."""
+
     serializer_class = CommentSerializer
     permission_classes = (IsAdminModeratorOwnerOrReadOnly,)
 
@@ -145,13 +145,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
-    """Вью-класс для жанров"""
+class GenreViewSet(CreateListDestroyViewset):
+    """Вью-класс для жанров."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -164,13 +159,8 @@ class GenreViewSet(
     permission_classes = (IsAdminOrReadOnly,)
 
 
-class CategoryViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
-    """Вью-класс для категорий"""
+class CategoryViewSet(CreateListDestroyViewset):
+    """Вью-класс для категорий."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -182,14 +172,12 @@ class CategoryViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    """Вью-класс для произведений"""
+    """Вью-класс для произведений."""
 
     queryset = (
         Title.objects.all().annotate(Avg('reviews__score')).order_by('name')
     )
     serializer_class = TitleSerializer
-    http_method_names = ['get', 'post', 'patch', 'delete', 'head']
-    # Убираем метод put из разрешенных
     pagination_class = TitleGenreCategoryPagination
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -200,3 +188,22 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleReadonlySerializer
         return TitleSerializer
         # используем разные сериализаторы в зависимости от метода
+
+    def update(self, request, *args, **kwargs):
+        raise exceptions.MethodNotAllowed(request.method)
+        # Если метод put, выдаем ошибку
+
+    def partial_update(self, request, *args, **kwargs):
+        # переопределяем метод patch - запроса на основе кода
+        # стандартного метода update из UpdateModelMixin
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
