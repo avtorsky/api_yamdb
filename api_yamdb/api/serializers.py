@@ -8,6 +8,7 @@ from reviews.models import User, Category, Comment, Genre, Review, Title
 
 class UserRegistrSerializer(serializers.ModelSerializer):
     """Сериализатор для регистраци пользователей."""
+
     username = serializers.CharField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())],
@@ -32,6 +33,7 @@ class UserRegistrSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.ModelSerializer):
     """Сериализатор для получения токенов."""
+
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
 
@@ -42,6 +44,7 @@ class TokenSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор пользователей."""
+
     username = serializers.CharField(
         validators=[UniqueValidator(queryset=User.objects.all())],
         required=True,
@@ -64,6 +67,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserEditSerializer(serializers.ModelSerializer):
     """Сериализатор редактирования пользователей."""
+
     class Meta:
         fields = (
             'id',
@@ -85,6 +89,7 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор отзывов."""
+
     title = serializers.SlugRelatedField(
         slug_field='name',
         read_only=True,
@@ -115,6 +120,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор комментариев."""
+
     review = serializers.SlugRelatedField(
         slug_field='text',
         read_only=True,
@@ -149,6 +155,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class TitleReadonlySerializer(serializers.ModelSerializer):
     """Сериализатор произведений для List и Retrieve."""
+
     rating = serializers.IntegerField(
         source='reviews__score__avg', read_only=True
     )
@@ -171,6 +178,7 @@ class TitleReadonlySerializer(serializers.ModelSerializer):
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор произведений для Create, Partial_Update и Delete."""
+
     category = serializers.SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all()
     )
