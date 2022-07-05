@@ -6,7 +6,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import (
     exceptions,
     filters,
-    pagination,
     permissions,
     status,
     viewsets,
@@ -46,7 +45,7 @@ def regist(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
-        User, username=serializer.validated_data["username"]
+        User, username=serializer.validated_data['username']
     )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
@@ -150,13 +149,6 @@ class GenreViewSet(CreateListDestroyViewset):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = pagination.PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-    # для того, чтобы получать эндпойнты по полю slug, а не pk
-    # добавляем этот аттрибут во вью и в сериализатор для жанров и категорий
-    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CategoryViewSet(CreateListDestroyViewset):
@@ -164,11 +156,6 @@ class CategoryViewSet(CreateListDestroyViewset):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = pagination.PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnly,)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -187,15 +174,11 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('retrieve', 'list'):
             return TitleReadonlySerializer
         return TitleSerializer
-        # используем разные сериализаторы в зависимости от метода
 
     def update(self, request, *args, **kwargs):
         raise exceptions.MethodNotAllowed(request.method)
-        # Если метод put, выдаем ошибку
 
     def partial_update(self, request, *args, **kwargs):
-        # переопределяем метод patch - запроса на основе кода
-        # стандартного метода update из UpdateModelMixin
         instance = self.get_object()
         serializer = self.get_serializer(
             instance, data=request.data, partial=True
