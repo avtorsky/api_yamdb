@@ -90,9 +90,6 @@ class Category(models.Model):
 
     name = models.CharField('Категория', max_length=256)
     slug = models.SlugField(unique=True)
-    # Убрал перевод, поскольку устоявшегося русского перевода нет
-    # slug он и есть slug
-    # Из всех которые есть мне больше всего нравится 'Уникальный идентификатор'
 
     class Meta:
         ordering = ('name',)
@@ -109,8 +106,6 @@ class Title(models.Model):
     year = models.SmallIntegerField(
         'Год выпуска', db_index=True, validators=(validate_title_year,)
     )
-    # Артем, подскажи, пожалуйста, это тот тип поля, который ты имел в виду?
-    # Positive делать не стал, т.к. есть произведения, написанные до н.э.
     description = models.TextField(blank=True, verbose_name='Описание')
     genre = models.ManyToManyField(
         Genre, through='GenreTitle', verbose_name='Жанр'
@@ -190,7 +185,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text
+        return self.text[:42]
 
 
 class Comment(models.Model):
@@ -220,4 +215,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return self.text[:42]

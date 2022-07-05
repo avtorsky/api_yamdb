@@ -1,4 +1,7 @@
-from rest_framework import mixins, viewsets
+from rest_framework import filters, mixins, viewsets
+
+from .pagination import TitleGenreCategoryPagination
+from .permissions import IsAdminOrReadOnly
 
 
 class CreateListDestroyViewset(
@@ -7,7 +10,9 @@ class CreateListDestroyViewset(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
-    """Вьюсет для Create, List и Destroy."""
-
     serializer_class = None
-    model_class = None
+    pagination_class = TitleGenreCategoryPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)

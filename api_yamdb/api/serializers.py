@@ -27,7 +27,7 @@ class UserRegistrSerializer(serializers.ModelSerializer):
 
     def validate_username(self, user):
         if user.lower() == 'me':
-            raise serializers.ValidationError('username не может быть  "me".')
+            raise serializers.ValidationError('username не может быть "me".')
         return user
 
 
@@ -71,19 +71,19 @@ class UserEditSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'id',
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
         )
         model = User
         read_only_fields = ('role',)
 
     def validate_username(self, user):
         if user.lower() == 'me':
-            raise serializers.ValidationError('username не может быть  "me".')
+            raise serializers.ValidationError('username не может быть "me".')
         return user
 
 
