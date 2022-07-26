@@ -172,7 +172,6 @@ class TitleReadonlySerializer(serializers.ModelSerializer):
             'genre',
             'category',
         )
-        # прямо прописываем поля, для порядка выдачи в JSON
         model = Title
 
 
@@ -185,7 +184,6 @@ class TitleSerializer(serializers.ModelSerializer):
     genre = serializers.SlugRelatedField(
         slug_field='slug', queryset=Genre.objects.all(), many=True
     )
-    # Many=True, потому что ManytoManyField
 
     class Meta:
         fields = '__all__'

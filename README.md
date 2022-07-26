@@ -14,6 +14,11 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220726:
+* ci(./docker-compose.yaml): настройка пайплайна сборки проекта
+* ci: переключение конфига БД с SQLite на PostgreSQL
+* fix(./api_yamdb/settings.py): улучшения безопастности
+
 Release 20220706:
 * fix(./api_yamdb/api/): поправлен линтинг в сериализаторах, вьюсеты CategoryViewSet и GenreViewSet переписаны согласно принципу DRY 
 * fix(./api_yamdb/api_yamdb/): минорные изменения в конфиге settings.py
@@ -40,25 +45,45 @@ Release 20220620:
 
 ## Развернуть локально
 
+Склонировать проект и создать виртуальное окружение:
+
 ```bash
 git clone https://github.com/avtorsky/api_yamdb.git
 cd api_yamdb
 python -m venv venv
 source venv/bin/activate
-pip3 install -r requirements.txt
 ```
 
-Создать локально файл окружения .env, в который записать SECRET_KEY и HOSTS, далее продолжить:
+Проинициализировать Docker и скачать образ проекта:
 
 ```bash
-python3 manage.py migrate
-python3 manage.py createsuperuser
-python3 manage.py runserver
+docker pull avtorsky/api_yamdb:v20220726
+docker image ls -a
+```
+
+В локальной директории проекта создать файл окружения .env, в который записать переменные по шаблону:
+
+```bash
+SECRET_KEY=key
+HOSTS=host1,host2,...
+DB_ENGINE=django.db.backends.postgresql
+POSTGRES_DB=yamdb
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+DB_HOST=host
+DB_PORT=port
+DEFAULT_FROM_EMAIL=email
+```
+
+После чего проинициализировать пайплайн сборки, выполнить миграции, создать суперпользователя и собрать статику:
+
+```bash
+docker-compose up -d --build
+docker-compose exec web python3 manage.py migrate
+docker-compose exec web python3 manage.py createsuperuser
+docker-compose exec web python3 manage.py collectstatic --no-input
 ```
 
 ## Документация
 
-```bash
-python3 manage.py runserver
-http://127.0.0.1:8000/redoc/
-```
+Доступна после сборки проекта на локальном хосте по маршруту: http://127.0.0.1/redoc/
