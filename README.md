@@ -1,8 +1,8 @@
 # YaMDb
 
 [Описание](#описание) /
-[История изменений](#история_изменений) /
-[Развернуть локально](#развернуть_локально) /
+[История изменений](#история-изменений) /
+[Развернуть локально](#развернуть-локально) /
 [Документация](#документация)
 
 
@@ -14,6 +14,9 @@
 * <a href="https://github.com/avtorsky" target="_blank">avtorsky</a>
 
 ## История изменений
+Release 20220729:
+* fix(./nginx/default.conf): отключена передача версии nginx на страницы ошибок
+
 Release 20220726:
 * ci(./docker-compose.yaml): настройка пайплайна сборки проекта
 * ci: переключение конфига БД с SQLite на PostgreSQL
@@ -57,7 +60,7 @@ source venv/bin/activate
 Проинициализировать Docker и скачать образ проекта:
 
 ```bash
-docker pull avtorsky/api_yamdb:v20220726
+docker pull avtorsky/api_yamdb:v20220729
 docker image ls -a
 ```
 
@@ -66,7 +69,6 @@ docker image ls -a
 ```bash
 SECRET_KEY=key
 HOSTS=host1,host2,...
-DB_ENGINE=django.db.backends.postgresql
 POSTGRES_DB=yamdb
 POSTGRES_USER=user
 POSTGRES_PASSWORD=password
@@ -86,4 +88,4 @@ docker-compose exec web python3 manage.py collectstatic --no-input
 
 ## Документация
 
-Доступна после сборки проекта на локальном хосте по маршруту: http://127.0.0.1/redoc/
+Доступна после сборки проекта на локальном хосте по маршруту http://127.0.0.1/redoc/
